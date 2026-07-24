@@ -1,0 +1,5 @@
+.legal-content{max-width:850px;margin-top:62px;border-radius:18px;padding:clamp(28px,6vw,58px)}
+.legal-content h1{margin:0;font-size:clamp(32px,5vw,48px);letter-spacing:-1.5px}
+.legal-content h2{margin:39px 0 11px;font-size:21px}
+.muted-text{color:var(--text-muted);max-width:720px}
+.legal-content .muted-text:first-of-type{margin-top:8px;font-size:13px}
