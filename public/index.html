@@ -8,16 +8,17 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="features.css" />
   <link rel="stylesheet" href="legal.css" />
+  <link rel="stylesheet" href="cookie-banner.css" />
 </head>
 <body>
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
   <div id="toast-region" aria-live="polite"></div>
 
-  <!-- SEKCJA STOISKA (LANDING) -->
+  <!-- SEKCJA LANDING -->
   <section id="landing" class="view active">
     <nav class="topbar glass">
-      <a class="brand" href="#landing" aria-label="Coppys Strona Główna">
+      <a class="brand" href="#landing" data-route="landing" aria-label="Coppys Strona Główna">
         <span class="brand-mark">C</span>
         <span>COPPYS<span class="dot">.</span></span>
       </a>
@@ -30,13 +31,10 @@
           </button>
           <div class="language-menu" id="language-menu"></div>
         </div>
+        <!-- Tylko logowanie przez Discord -->
         <button class="login discord" id="discord-login">
           <span class="discord-icon">◉</span>
           <span data-i18n="loginDiscord">Zaloguj przez Discord</span>
-        </button>
-        <button class="login google" id="google-login">
-          <span class="google-icon">G</span>
-          <span data-i18n="loginGoogle">Zaloguj przez Google</span>
         </button>
       </div>
     </nav>
@@ -52,7 +50,7 @@
           <button class="button primary pulse" id="add-bot">
             ✦ <span data-i18n="addBot">Dodaj do Discorda</span>
           </button>
-          <a class="button secondary" href="#servers" data-i18n="openDashboard">Otwórz Panel Zarządzania</a>
+          <a class="button secondary" href="#servers" data-route="servers" data-i18n="openDashboard">Otwórz Panel Zarządzania</a>
         </div>
         <div class="stats" aria-label="Statystyki Coppys">
           <div>
@@ -78,12 +76,21 @@
         <div class="feature-grid" id="feature-grid"></div>
       </section>
     </main>
+
+    <!-- STOPKA PRAWNA -->
+    <footer style="max-width: 1180px; margin: 40px auto; padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 13px;">
+      <div>© 2026 Coppys. Wszelkie prawa zastrzeżone. Niezależna usługa dla platformy Discord.</div>
+      <div style="display: flex; gap: 16px;">
+        <a href="#terms" data-route="terms" style="color: var(--text-muted); text-decoration: none;">Regulamin</a>
+        <a href="#privacy" data-route="privacy" style="color: var(--text-muted); text-decoration: none;">Polityka Prywatności</a>
+      </div>
+    </footer>
   </section>
 
   <!-- SEKCJA WYBORU SERWERÓW -->
   <section id="servers" class="view">
     <nav class="topbar glass compact">
-      <a class="brand" href="#landing">
+      <a class="brand" href="#landing" data-route="landing">
         <span class="brand-mark">C</span>
         <span>COPPYS<span class="dot">.</span></span>
       </a>
@@ -101,7 +108,7 @@
   <section id="dashboard" class="view dashboard-view">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
-        <a class="brand" href="#landing">
+        <a class="brand" href="#landing" data-route="landing">
           <span class="brand-mark">C</span>
           <span>COPPYS<span class="dot">.</span></span>
         </a>
@@ -109,7 +116,7 @@
       </div>
       <div class="guild-context" id="guild-context"></div>
       <nav class="side-nav" id="side-nav"></nav>
-      <a href="#servers" class="back-link">← <span data-i18n="backGuilds">Wróć do serwerów</span></a>
+      <a href="#servers" data-route="servers" class="back-link">← <span data-i18n="backGuilds">Wróć do serwerów</span></a>
     </aside>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
@@ -140,7 +147,7 @@
   <!-- BRAMKA WERYFIKACJI (GATEWAY) -->
   <section id="gateway" class="view gateway-view">
     <nav class="gateway-nav">
-      <a class="brand" href="#landing">
+      <a class="brand" href="#landing" data-route="landing">
         <span class="brand-mark">C</span>
         <span>COPPYS<span class="dot">.</span></span>
       </a>
@@ -156,16 +163,16 @@
         <h1 data-i18n="gatewayTitle">Witaj na Serwerze</h1>
         <p data-i18n="gatewayCopy">Zanim dołączysz, potwierdź zapoznanie się z naszymi zasadami społeczności.</p>
         <div class="terms">
-          <button class="document-link" data-document="terms">
+          <a class="document-link" href="#terms" data-route="terms">
             ✓ <span data-i18n="terms">Regulamin Usług</span>
             <span class="doc-state">Wymagane</span>
-          </button>
-          <button class="document-link" data-document="privacy">
+          </a>
+          <a class="document-link" href="#privacy" data-route="privacy">
             ✓ <span data-i18n="privacy">Polityka Prywatności</span>
             <span class="doc-state">Wymagane</span>
-          </button>
+          </a>
         </div>
-        <button class="button primary verify-button" id="verify-button" disabled data-i18n="verify">
+        <button class="button primary verify-button" id="verify-button" data-i18n="verify">
           Zweryfikuj i przejdź do Discorda
         </button>
         <small>Protected by Coppys Security Engine</small>
@@ -184,26 +191,33 @@
     </div>
   </div>
 
-  <!-- REGULAMIN -->
+  <!-- REGULAMIN USŁUG -->
   <section id="terms" class="view legal-view">
     <nav class="topbar glass compact">
-      <a class="brand" href="#landing">
+      <a class="brand" href="#landing" data-route="landing">
         <span class="brand-mark">C</span>
         <span>COPPYS<span class="dot">.</span></span>
       </a>
-      <a class="button secondary" href="#landing">← Powrót</a>
+      <a class="button secondary" href="#landing" data-route="landing">← Powrót</a>
     </nav>
     <main class="page-shell legal-content glass">
       <p class="eyebrow">DOKUMENT PRAWNY</p>
-      <h1>Regulamin Usług</h1>
+      <h1>Regulamin Usług (Terms of Service)</h1>
       <p class="muted-text">Ostatnia aktualizacja: 25 lipca 2026 r.</p>
-      <h2>1. Postanowienia ogólne</h2>
+      
+      <h2>1. Akceptacja Regulaminu</h2>
       <p class="muted-text">
-        Niniejszy Regulamin określa zasady korzystania z bota Coppys, jego witryny oraz panelu zarządzania. Korzystając z Usług, użytkownik potwierdza, że posiada wymagane uprawnienia do zarządzania serwerem Discord.
+        Korzystając z bota Coppys, strony internetowej oraz panelu zarządzania, użytkownik wyraża pełną zgodę na niniejszy Regulamin oraz wytyczne dla deweloperów platformy Discord (Discord Developer Terms of Service).
       </p>
-      <h2>2. Działanie bota i ochrona</h2>
+
+      <h2>2. Dostęp do Panelu i Autoryzacja</h2>
       <p class="muted-text">
-        Coppys świadczy usługi automatyzacji moderacji, dzienników zdarzeń oraz bramki weryfikacyjnej. Korzystanie z bota jest dobrowolne, a konfiguracja opiera się na uprawnieniach przyznanych przez administratorów serwera.
+        Autoryzacja w aplikacji odbywa się wyłącznie poprzez protokół Discord OAuth2. Nie pobieramy ani nie przechowujemy haseł użytkowników. Wymagane są odpowiednie uprawnienia administracyjne na danym serwerze, aby dokonywać w nim zmian.
+      </p>
+
+      <h2>3. Prawa i Odpowiedzialność</h2>
+      <p class="muted-text">
+        Zastrzegamy sobie prawo do ograniczenia lub zablokowania dostępu do bota w przypadku wykrycia nadużyć, prób ataków rajdowych lub łamania zasad regulaminu Discorda.
       </p>
     </main>
   </section>
@@ -211,25 +225,37 @@
   <!-- POLITYKA PRYWATNOŚCI -->
   <section id="privacy" class="view legal-view">
     <nav class="topbar glass compact">
-      <a class="brand" href="#landing">
+      <a class="brand" href="#landing" data-route="landing">
         <span class="brand-mark">C</span>
         <span>COPPYS<span class="dot">.</span></span>
       </a>
-      <a class="button secondary" href="#landing">← Powrót</a>
+      <a class="button secondary" href="#landing" data-route="landing">← Powrót</a>
     </nav>
     <main class="page-shell legal-content glass">
       <p class="eyebrow">DOKUMENT PRAWNY</p>
-      <h1>Polityka Prywatności</h1>
+      <h1>Polityka Prywatności i RODO</h1>
       <p class="muted-text">Ostatnia aktualizacja: 25 lipca 2026 r.</p>
-      <h2>1. Przetwarzane dane</h2>
+      
+      <h2>1. Przetwarzanie Danych Osobowych</h2>
       <p class="muted-text">
-        W celu obsługi logowania OAuth2 i panelu zarządzania przetwarzamy ID użytkownika, nazwę konta, awatar oraz identyfikatory serwerów. Nie przechowujemy haseł ani prywatnych danych dostępowych.
+        Administratorem danych przetwarzanych w usłudze Coppys jest operator bota. Przetwarzamy wyłącznie niezbędne identyfikatory publiczne dostarczane przez Discord API (ID użytkownika, nazwę użytkownika, awatar oraz listę zarządzanych serwerów).
+      </p>
+
+      <h2>2. Pliki Cookies i Pamięć Lokalna (LocalStorage)</h2>
+      <p class="muted-text">
+        Serwis wykorzystuje LocalStorage wyłącznie do zapisywania preferencji językowych użytkownika oraz informacji o akceptacji niniejszej Polityki Prywatności.
+      </p>
+
+      <h2>3. Prawa Użytkownika</h2>
+      <p class="muted-text">
+        Każdy użytkownik ma prawo do wglądu w swoje dane, żądania ich sprostowania, a także usunięcia wszystkich danych serwera poprzez usunięcie bota z danego serwera Discord.
       </p>
     </main>
   </section>
 
   <!-- SKRYPTY APLIKACJI -->
   <script src="bot-features.js"></script>
+  <script src="cookie-banner.js"></script>
   <script src="app.js"></script>
   <script src="router.js"></script>
 </body>

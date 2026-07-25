@@ -29,7 +29,6 @@ const channels = [
 const translations = {
   pl: {
     loginDiscord: 'Zaloguj przez Discord',
-    loginGoogle: 'Zaloguj przez Google',
     heroTitle: 'Twój serwer. <span>Bez granic.</span>',
     heroCopy: 'Coppys łączy zaawansowaną moderację, weryfikację użytkowników i pełną automatyzację w jednym perfekcyjnie dopracowanym panelu WWW.',
     addBot: 'Dodaj do Discorda',
@@ -54,7 +53,6 @@ const translations = {
   },
   en: {
     loginDiscord: 'Log in with Discord',
-    loginGoogle: 'Log in with Google',
     heroTitle: 'Your server. <span>Without limits.</span>',
     heroCopy: 'Coppys unifies intelligent moderation, user verification, and automation in one sleek web control center.',
     addBot: 'Add to Discord',
@@ -102,34 +100,19 @@ function t(key) {
 function applyLanguage() {
   const lang = translations[AppState.language] ? AppState.language : 'en';
   document.documentElement.lang = lang;
-  document.querySelector('#current-flag').textContent = languageMeta[AppState.language][0];
-  document.querySelector('#current-language').textContent = languageMeta[AppState.language][1];
+  if (document.querySelector('#current-flag')) document.querySelector('#current-flag').textContent = languageMeta[AppState.language][0];
+  if (document.querySelector('#current-language')) document.querySelector('#current-language').textContent = languageMeta[AppState.language][1];
   document.querySelectorAll('[data-i18n]').forEach(e => e.innerHTML = t(e.dataset.i18n));
   renderLanguageMenu();
-  renderFeatures();
+  if (typeof renderFeatures === 'function') renderFeatures();
 }
 
 function renderLanguageMenu() {
-  document.querySelector('#language-menu').innerHTML = Object.entries(languageMeta)
+  const menu = document.querySelector('#language-menu');
+  if (!menu) return;
+  menu.innerHTML = Object.entries(languageMeta)
     .map(([key, [flag, label]]) => `<button data-lang="${key}">${flag} ${label}</button>`)
     .join('');
-}
-
-function switchView(view) {
-  if ((view === 'servers' || view === 'dashboard') && !AppState.user) {
-    location.hash = 'landing';
-    return;
-  }
-  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === view));
-  AppState.currentView = view;
-  if (view === 'servers') renderGuilds();
-  if (view === 'dashboard') renderDashboard();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function route() {
-  const view = location.hash.slice(1) || 'landing';
-  switchView(['landing', 'servers', 'dashboard', 'gateway', 'terms', 'privacy'].includes(view) ? view : 'landing');
 }
 
 async function checkAuthStatus() {
@@ -138,13 +121,10 @@ async function checkAuthStatus() {
     if (!response.ok) return;
     const payload = await response.json();
     if (payload.loggedIn === true) {
-      AppState.user = payload.user || { name:payload.name, tag:payload.tag, avatar:payload.avatar };
+      AppState.user = payload.user || { name: payload.name, tag: payload.tag, avatar: payload.avatar };
       applyLanguage();
       if (window.navigate) {
-        window.navigate('servers', AppState.language, true);
-      } else {
-        location.hash = 'servers';
-        route();
+        window.navigate('servers');
       }
     }
   } catch (error) {
@@ -154,19 +134,22 @@ async function checkAuthStatus() {
 
 document.addEventListener('DOMContentLoaded', checkAuthStatus);
 
+// Tylko autoryzacja przez Discord
 document.addEventListener('click', event => {
-  const provider = event.target.closest('#discord-login,#google-login');
+  const provider = event.target.closest('#discord-login');
   if (!provider) return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  window.location.assign(provider.id === 'discord-login' ? '/api/auth/discord' : '/api/auth/google');
+  window.location.assign('/api/auth/discord');
 }, true);
 
 function renderFeatures() {
   const featureData = window.BotFeaturesData || [];
   const lang = AppState.language || 'pl';
+  const grid = document.querySelector('#feature-grid');
+  if (!grid) return;
 
-  document.querySelector('#feature-grid').innerHTML = featureData.map(item => {
+  grid.innerHTML = featureData.map(item => {
     const title = item.title[lang] || item.title.pl;
     const desc = item.description[lang] || item.description.pl;
     return `
@@ -189,32 +172,49 @@ function renderFeatures() {
 
 function renderGuilds() {
   const currentUser = AppState.user || { name: 'Demo User', tag: 'Demo#0000' };
-  document.querySelector('#user-chip').innerHTML = `<span class="avatar">${currentUser.avatar || currentUser.name?.slice(0, 2).toUpperCase() || 'U'}</span><span>${currentUser.tag || currentUser.name}</span>`;
-  document.querySelector('#user-name').textContent = (currentUser.name || currentUser.tag || 'Użytkowniku').split(' ')[0];
-  document.querySelector('#guild-grid').innerHTML = guilds.map((g, i) => `
-    <article class="guild-card">
-      <div class="guild-logo" style="background:linear-gradient(135deg,${g.color},#172554)">${g.initial}</div>
-      <h3>${g.name}</h3>
-      <p>${g.members} członków</p>
-      <button class="button ${g.hasBot ? 'primary' : 'muted'}" data-guild="${i}">
-        ${g.hasBot ? 'Zarządzaj' : '＋ Skonfiguruj i zaproś'}
-      </button>
-    </article>
-  `).join('');
+  const userChip = document.querySelector('#user-chip');
+  if (userChip) {
+    userChip.innerHTML = `<span class="avatar">${currentUser.avatar || currentUser.name?.slice(0, 2).toUpperCase() || 'U'}</span><span>${currentUser.tag || currentUser.name}</span>`;
+  }
+  if (document.querySelector('#user-name')) {
+    document.querySelector('#user-name').textContent = (currentUser.name || currentUser.tag || 'Użytkowniku').split(' ')[0];
+  }
+  const guildGrid = document.querySelector('#guild-grid');
+  if (guildGrid) {
+    guildGrid.innerHTML = guilds.map((g, i) => `
+      <article class="guild-card">
+        <div class="guild-logo" style="background:linear-gradient(135deg,${g.color},#172554)">${g.initial}</div>
+        <h3>${g.name}</h3>
+        <p>${g.members} członków</p>
+        <button class="button ${g.hasBot ? 'primary' : 'muted'}" data-guild="${i}">
+          ${g.hasBot ? 'Zarządzaj' : '＋ Skonfiguruj i zaproś'}
+        </button>
+      </article>
+    `).join('');
+  }
 }
 
 function renderDashboard() {
   const g = AppState.currentGuild || guilds[0];
-  document.querySelector('#guild-context').innerHTML = `<span class="guild-logo" style="background:${g.color}">${g.initial}</span><span>${g.name}</span>`;
-  document.querySelector('#side-nav').innerHTML = tabs.map(([id, icon, label]) => `
-    <button data-tab="${id}" class="${AppState.dashboardTab === id ? 'active' : ''}">
-      <span>${icon}</span> ${label}
-    </button>
-  `).join('');
+  const context = document.querySelector('#guild-context');
+  if (context) {
+    context.innerHTML = `<span class="guild-logo" style="background:${g.color}">${g.initial}</span><span>${g.name}</span>`;
+  }
+  const sideNav = document.querySelector('#side-nav');
+  if (sideNav) {
+    sideNav.innerHTML = tabs.map(([id, icon, label]) => `
+      <button data-tab="${id}" class="${AppState.dashboardTab === id ? 'active' : ''}">
+        <span>${icon}</span> ${label}
+      </button>
+    `).join('');
+  }
   
   const tab = tabs.find(x => x[0] === AppState.dashboardTab);
-  document.querySelector('#dashboard-title').textContent = tab[2];
+  if (document.querySelector('#dashboard-title')) {
+    document.querySelector('#dashboard-title').textContent = tab[2];
+  }
   const content = document.querySelector('#dashboard-content');
+  if (!content) return;
   
   if (AppState.dashboardTab === 'overview') content.innerHTML = overviewHTML();
   else if (AppState.dashboardTab === 'channels') content.innerHTML = channelsHTML();
@@ -287,7 +287,7 @@ function verificationHTML() {
         </div>
       </div>
       <aside class="verification-preview">
-        <p class="eyebrow">PODGLĄD EMED W DISCORDZIE</p>
+        <p class="eyebrow">PODGLĄD EMBED W DISCORDZIE</p>
         <div class="embed">
           <strong>Coppys • System Weryfikacji</strong>
           <p id="embed-preview">${d.message}</p>
@@ -308,7 +308,8 @@ function placeholderHTML(name) {
 
 function setDirty(value = true) {
   AppState.isDirty = value;
-  document.querySelector('#save-bar').classList.toggle('visible', value);
+  const bar = document.querySelector('#save-bar');
+  if (bar) bar.classList.toggle('visible', value);
 }
 
 function toast(message) {
@@ -320,13 +321,6 @@ function toast(message) {
 }
 
 document.addEventListener('click', e => {
-  const lang = e.target.closest('[data-lang]');
-  if (lang) {
-    AppState.language = lang.dataset.lang;
-    localStorage.setItem('coppys-language', AppState.language);
-    applyLanguage();
-    document.querySelector('#language-select').classList.remove('open');
-  }
   if (e.target.closest('#language-trigger')) document.querySelector('#language-select').classList.toggle('open');
   if (e.target.closest('#add-bot')) toast('Otwieranie zaproszenia bota Coppys…');
   
@@ -335,7 +329,7 @@ document.addEventListener('click', e => {
     const g = guilds[guildButton.dataset.guild];
     if (g.hasBot) {
       AppState.currentGuild = g;
-      location.hash = 'dashboard';
+      if (window.navigate) window.navigate('dashboard');
     } else {
       document.querySelector('#invite-title').textContent = 'Dodaj Coppys do ' + g.name;
       document.querySelector('#invite-modal').classList.add('open');
@@ -395,7 +389,3 @@ document.addEventListener('change', e => {
     setDirty();
   }
 });
-
-window.addEventListener('hashchange', route);
-applyLanguage();
-route();
