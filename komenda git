@@ -1,0 +1,3 @@
+git add .
+git commit -m "Aktualizacja funkcji strony bota oraz dodanie/zmienienie plików"
+git push
