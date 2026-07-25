@@ -1,27 +1,401 @@
-const AppState={user:null,currentGuild:null,currentView:'landing',isDirty:false,language:localStorage.getItem('coppys-language')||'pl',dashboardTab:'overview',draft:{}};
-const guilds=[['Nova Gaming','12,842',true,'N','#0ea5e9'],['Pixel Forge','4,291',true,'P','#8b5cf6'],['Arcadia Hub','18,407',false,'A','#f97316'],['Lunar Lounge','2,094',true,'L','#14b8a6'],['Code Syndicate','6,713',false,'C','#ef4444'],['Night Shift','1,299',false,'N','#ec4899']].map(([name,members,hasBot,initial,color])=>({name,members,hasBot,initial,color}));
-const channels=[{name:'general',type:'Tekstowy',assignment:'none'},{name:'logs',type:'Tekstowy',assignment:'logs'},{name:'welcome',type:'Tekstowy',assignment:'welcome'},{name:'music',type:'Tekstowy',assignment:'music'},{name:'Chill Zone',type:'Głosowy',assignment:'none'}];
-const translations={pl:{loginDiscord:'Zaloguj przez Discord',loginGoogle:'Zaloguj przez Google',heroTitle:'Twój serwer. <span>Bez granic.</span>',heroCopy:'Coppys łączy inteligentną moderację, muzykę i automatyzację w jednym perfekcyjnie dopracowanym centrum dowodzenia.',addBot:'Dodaj do Discorda',openDashboard:'Otwórz Panel Zarządzania',servers:'Serwery',users:'Użytkownicy',featuresTitle:'Wszystko, czego potrzebuje Twój serwer.',controlCenter:'CENTRUM DOWODZENIA',hello:'Witaj',selectGuild:'Wybierz serwer, którym chcesz zarządzać.',backGuilds:'Wróć do serwerów',unsaved:'Masz niezapisane zmiany!',unsavedHint:'Zapisz konfigurację, aby wdrożyć ją na serwerze.',cancel:'Anuluj',save:'Zapisz zmiany',secureGateway:'BEZPIECZNA BRAMKA',gatewayTitle:'Witaj w Nova Gaming',gatewayCopy:'Zanim dołączysz, potwierdź zapoznanie się z naszymi zasadami społeczności.',terms:'Regulamin Usług',privacy:'Polityka Prywatności',verify:'Zweryfikuj i przejdź do Discorda'},en:{loginDiscord:'Log in with Discord',loginGoogle:'Log in with Google',heroTitle:'Your server. <span>Without limits.</span>',heroCopy:'Coppys unifies intelligent moderation, music and automation in one beautifully engineered command center.',addBot:'Add to Discord',openDashboard:'Open Dashboard',servers:'Servers',users:'Users',featuresTitle:'Everything your server needs.',controlCenter:'COMMAND CENTER',hello:'Hello',selectGuild:'Choose a server to manage.',backGuilds:'Back to servers',unsaved:'You have unsaved changes!',unsavedHint:'Save your configuration to deploy it to your server.',cancel:'Cancel',save:'Save changes',secureGateway:'SECURE GATEWAY',gatewayTitle:'Welcome to Nova Gaming',gatewayCopy:'Before joining, confirm that you have read our community policies.',terms:'Terms of Service',privacy:'Privacy Policy',verify:'Verify and go to Discord'}};
-const languageMeta={pl:['🇵🇱','PL'],en:['🇬🇧','EN'],de:['🇩🇪','DE'],fr:['🇫🇷','FR'],ja:['🇯🇵','JA']};
-const features=[['◈','Inteligentna Moderacja','Wykrywanie zagrożeń w czasie rzeczywistym, AutoMod i pełne logi audytowe.'],['♫','System Muzyczny','Krystaliczny dźwięk, kolejki współdzielone i wsparcie dla wszystkich platform.'],['⌾','Weryfikacja Zero-Trust','Konfigurowalne bramki, zabezpieczenia anty-bot i nadawanie ról.'],['◆','Ekonomia i Leveling','Dynamiczna ekonomia serwera, rankingi i system nagród premium.']];
-const tabs=[['overview','▦','Przegląd'],['channels','＃','Kanały i role'],['verification','◉','Moduł Weryfikacji'],['moderation','◈','Automatyczna Moderacja'],['music','♫','System Muzyczny'],['logs','☷','Logi i Audyt']];
-function t(key){return(translations[AppState.language]||translations.en)[key]||translations.en[key]||key}
-function applyLanguage(){const lang=translations[AppState.language]?AppState.language:'en';document.documentElement.lang=lang;document.querySelector('#current-flag').textContent=languageMeta[AppState.language][0];document.querySelector('#current-language').textContent=languageMeta[AppState.language][1];document.querySelectorAll('[data-i18n]').forEach(e=>e.innerHTML=t(e.dataset.i18n));renderLanguageMenu()}
-function renderLanguageMenu(){document.querySelector('#language-menu').innerHTML=Object.entries(languageMeta).map(([key,[flag,label]])=>`<button data-lang="${key}">${flag} ${label}</button>`).join('')}
-function switchView(view){if((view==='servers'||view==='dashboard')&&!AppState.user){location.hash='landing';return}document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));AppState.currentView=view;if(view==='servers')renderGuilds();if(view==='dashboard')renderDashboard();window.scrollTo({top:0,behavior:'smooth'})}
-function route(){const view=location.hash.slice(1)||'landing';switchView(['landing','servers','dashboard','gateway','terms','privacy'].includes(view)?view:'landing')}
-async function checkAuthStatus(){try{const response=await fetch('/api/user',{credentials:'include',headers:{Accept:'application/json'}});if(!response.ok)return;const payload=await response.json();if(payload.loggedIn===true){AppState.user=payload.user||{name:payload.name,tag:payload.tag,avatar:payload.avatar};applyLanguage();if(window.navigate){window.navigate('servers',AppState.language,true)}else{location.hash='servers';route()}}}catch(error){console.info('Authentication status is unavailable until the backend is connected.')}}
-document.addEventListener('DOMContentLoaded',checkAuthStatus);
-document.addEventListener('click',event=>{const provider=event.target.closest('#discord-login,#google-login');if(!provider)return;event.preventDefault();event.stopImmediatePropagation();window.location.assign(provider.id==='discord-login'?'/api/auth/discord':'/api/auth/google')},true);
-function renderFeatures(){document.querySelector('#feature-grid').innerHTML=features.map(([icon,title,desc])=>`<article class="feature-card"><div class="feature-icon">${icon}</div><h3>${title}</h3><p>${desc}</p></article>`).join('')}
-function renderGuilds(){const currentUser=AppState.user;document.querySelector('#user-chip').innerHTML=`<span class="avatar">${currentUser.avatar||currentUser.name?.slice(0,2).toUpperCase()||'U'}</span><span>${currentUser.tag||currentUser.name}</span>`;document.querySelector('#user-name').textContent=(currentUser.name||currentUser.tag||'Użytkowniku').split(' ')[0];document.querySelector('#guild-grid').innerHTML=guilds.map((g,i)=>`<article class="guild-card"><div class="guild-logo" style="background:linear-gradient(135deg,${g.color},#172554)">${g.initial}</div><h3>${g.name}</h3><p>${g.members} członków</p><button class="button ${g.hasBot?'primary':'muted'}" data-guild="${i}">${g.hasBot?'Zarządzaj':'＋ Skonfiguruj i zaproś'}</button></article>`).join('')}
-function renderDashboard(){const g=AppState.currentGuild||guilds[0];document.querySelector('#guild-context').innerHTML=`<span class="guild-logo" style="background:${g.color}">${g.initial}</span><span>${g.name}</span>`;document.querySelector('#side-nav').innerHTML=tabs.map(([id,icon,label])=>`<button data-tab="${id}" class="${AppState.dashboardTab===id?'active':''}"><span>${icon}</span> ${label}</button>`).join('');const tab=tabs.find(x=>x[0]===AppState.dashboardTab);document.querySelector('#dashboard-title').textContent=tab[2];const content=document.querySelector('#dashboard-content');if(AppState.dashboardTab==='overview')content.innerHTML=overviewHTML();else if(AppState.dashboardTab==='channels')content.innerHTML=channelsHTML();else if(AppState.dashboardTab==='verification')content.innerHTML=verificationHTML();else content.innerHTML=placeholderHTML(tab[2]);}
-function overviewHTML(){return `<div class="overview-grid"><div class="metric glass"><small>CZŁONKOWIE</small><strong>12,842</strong></div><div class="metric glass"><small>AKTYWNE MODUŁY</small><strong>05</strong></div><div class="metric glass"><small>KOMENDY / 24H</small><strong>2,841</strong></div><div class="metric glass"><small>STATUS API</small><strong style="color:#47ed91">99.99%</strong></div></div><section class="module-card glass"><h2>Stan serwera</h2><p>Wszystkie systemy Coppys pracują prawidłowo. Ostatnia synchronizacja: przed 24 sekundami.</p><button class="button secondary" data-tab-link="channels">Skonfiguruj kanały →</button></section>`}
-function channelsHTML(){return `<section class="module-card glass"><h2>Struktura kanałów i ról</h2><p>Przypisz wyspecjalizowane funkcje Coppys do kanałów serwera i zarządzaj uprawnieniami bota.</p><div class="channel-list">${channels.map((c,i)=>`<div class="channel-row"><div class="channel-name">${c.type==='Głosowy'?'◖':'#'} ${c.name}<small>${c.type}</small></div><select data-channel="${i}"><option value="none" ${c.assignment==='none'?'selected':''}>Brak dedykowanej funkcji</option><option value="logs" ${c.assignment==='logs'?'selected':''}>Kanał dla logów bota</option><option value="welcome" ${c.assignment==='welcome'?'selected':''}>Kanał powitalny użytkowników</option><option value="music" ${c.assignment==='music'?'selected':''}>Kanał dla komend muzycznych</option></select><button class="permission-trigger">Uprawnienia ⚙</button><div class="permission-row" data-permissions="${i}">${['Wyświetlanie kanału','Wysyłanie wiadomości','Zarządzanie wiadomościami'].map(p=>`<button data-perm="${p}">Domyślnie · ${p}</button>`).join('')}</div></div>`).join('')}</div></section>`}
-function verificationHTML(){const d=AppState.draft.verification||{terms:true,role:'Zweryfikowany',message:'Witaj na **Nova Gaming**!\nKliknij przycisk poniżej, aby zaakceptować regulamin i odblokować pełny dostęp do serwera.'};return `<section class="verification-layout"><div class="module-card glass"><h2>Brama Get-Acquainted</h2><p>Skonfiguruj pierwsze wrażenie i zasady dostępu dla nowych członków.</p><div class="setting-stack"><div class="setting toggle-line"><div><label>Wymagaj akceptacji regulaminu</label><small>Użytkownik musi przeczytać dokumenty przed weryfikacją.</small></div><button class="toggle ${d.terms?'on':''}" id="terms-toggle"><span></span></button></div><div class="setting"><label for="verified-role">Rola po pomyślnej weryfikacji</label><select id="verified-role">${['Zweryfikowany','Członek','Nowy gracz','Gość'].map(r=>`<option ${r===d.role?'selected':''}>${r}</option>`).join('')}</select></div><div class="setting"><label for="welcome-message">Treść wiadomości powitalnej</label><textarea id="welcome-message">${d.message}</textarea></div></div></div><aside class="verification-preview"><p class="eyebrow">PODGLĄD NA ŻYWO</p><div class="embed"><strong>Coppys • Weryfikacja</strong><p id="embed-preview">${d.message}</p></div></aside></section>`}
-function placeholderHTML(name){return `<section class="module-card glass"><h2>${name}</h2><p>Ten moduł jest aktywny i gotowy do dalszej konfiguracji. Centrum Coppys synchronizuje ustawienia w czasie rzeczywistym.</p><div class="overview-grid"><div class="metric glass"><small>STATUS</small><strong style="color:#47ed91">Aktywny</strong></div><div class="metric glass"><small>ZASADY</small><strong>12</strong></div><div class="metric glass"><small>ZDARZENIA</small><strong>248</strong></div><div class="metric glass"><small>PING</small><strong>12ms</strong></div></div></section>`}
-function setDirty(value=true){AppState.isDirty=value;document.querySelector('#save-bar').classList.toggle('visible',value)}
-function toast(message){const el=document.createElement('div');el.className='toast';el.textContent=message;document.querySelector('#toast-region').append(el);setTimeout(()=>el.remove(),2800)}
-function animateCounts(){document.querySelectorAll('[data-count]').forEach(el=>{const target=+el.dataset.count,start=performance.now();function step(now){const p=Math.min((now-start)/1300,1),val=Math.floor(target*(1-Math.pow(1-p,3)));el.textContent=el.dataset.format==='compact'?(val/1e6).toFixed(1)+'M':val.toLocaleString('en-US');if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)})}
-document.addEventListener('click',e=>{const lang=e.target.closest('[data-lang]');if(lang){AppState.language=lang.dataset.lang;localStorage.setItem('coppys-language',AppState.language);applyLanguage();document.querySelector('#language-select').classList.remove('open')}if(e.target.closest('#language-trigger'))document.querySelector('#language-select').classList.toggle('open');if(e.target.closest('#discord-login')||e.target.closest('#google-login')){AppState.user=user;location.hash='servers';toast('Zalogowano pomyślnie jako '+user.tag)}if(e.target.closest('#add-bot'))toast('Otwieranie bezpiecznego zaproszenia Discord…');const guildButton=e.target.closest('[data-guild]');if(guildButton){const g=guilds[guildButton.dataset.guild];if(g.hasBot){AppState.currentGuild=g;location.hash='dashboard'}else{document.querySelector('#invite-title').textContent='Dodaj Coppys do '+g.name;document.querySelector('#invite-modal').classList.add('open')}}if(e.target.closest('#modal-close'))document.querySelector('#invite-modal').classList.remove('open');if(e.target.closest('#confirm-invite')){document.querySelector('#invite-modal').classList.remove('open');toast('Symulacja: otwarto autoryzację Discord.')}const tab=e.target.closest('[data-tab]');if(tab){AppState.dashboardTab=tab.dataset.tab;renderDashboard()}const tabLink=e.target.closest('[data-tab-link]');if(tabLink){AppState.dashboardTab=tabLink.dataset.tabLink;renderDashboard()}const perm=e.target.closest('.permission-trigger');if(perm)perm.closest('.channel-row').classList.toggle('expanded');const p=e.target.closest('[data-perm]');if(p){p.closest('.permission-row').querySelectorAll('button').forEach(x=>x.classList.remove('selected'));p.classList.add('selected');setDirty()}if(e.target.closest('#terms-toggle')){const d=AppState.draft.verification||{};d.terms=!document.querySelector('#terms-toggle').classList.contains('on');AppState.draft.verification={...d,role:document.querySelector('#verified-role').value,message:document.querySelector('#welcome-message').value};document.querySelector('#terms-toggle').classList.toggle('on');setDirty()}const doc=e.target.closest('.document-link');if(doc){doc.classList.add('read');doc.querySelector('.doc-state').textContent='Przeczytano';if(document.querySelectorAll('.document-link.read').length===2){document.querySelector('#verify-button').disabled=false;toast('Dokumenty potwierdzone — możesz kontynuować.')}}if(e.target.closest('#verify-button')&&!e.target.closest('#verify-button').disabled)toast('Weryfikacja zakończona pomyślnie. Witamy na serwerze!');if(e.target.closest('#hamburger')){document.querySelector('#sidebar').classList.add('open');document.querySelector('#sidebar-overlay').classList.add('open')}if(e.target.closest('#close-menu')||e.target.closest('#sidebar-overlay')){document.querySelector('#sidebar').classList.remove('open');document.querySelector('#sidebar-overlay').classList.remove('open')}if(e.target.closest('#discard-changes')){AppState.draft={};setDirty(false);renderDashboard()}if(e.target.closest('#save-changes')){const btn=document.querySelector('#save-changes');btn.textContent='Zapisywanie…';btn.disabled=true;setTimeout(()=>{btn.textContent=t('save');btn.disabled=false;setDirty(false);toast('✓ Zmiany zostały wdrożone na serwerze.')},850)}});
-document.addEventListener('change',e=>{if(e.target.matches('[data-channel]')){channels[e.target.dataset.channel].assignment=e.target.value;setDirty()}if(e.target.id==='verified-role'){const d=AppState.draft.verification||{};AppState.draft.verification={...d,terms:document.querySelector('#terms-toggle').classList.contains('on'),role:e.target.value,message:document.querySelector('#welcome-message').value};setDirty()}});document.addEventListener('input',e=>{if(e.target.id==='welcome-message'){document.querySelector('#embed-preview').textContent=e.target.value;const d=AppState.draft.verification||{};AppState.draft.verification={...d,terms:document.querySelector('#terms-toggle').classList.contains('on'),role:document.querySelector('#verified-role').value,message:e.target.value};setDirty()}});window.addEventListener('hashchange',route);renderFeatures();applyLanguage();route();setTimeout(animateCounts,300);
+/**
+ * Coppys - Główny skrypt aplikacji i panelu
+ */
+const AppState = {
+  user: null,
+  currentGuild: null,
+  currentView: 'landing',
+  isDirty: false,
+  language: localStorage.getItem('coppys-language') || 'pl',
+  dashboardTab: 'overview',
+  draft: {}
+};
+
+const guilds = [
+  ['Nova Gaming', '12,842', true, 'N', '#0ea5e9'],
+  ['Pixel Forge', '4,291', true, 'P', '#8b5cf6'],
+  ['Arcadia Hub', '18,407', false, 'A', '#f97316'],
+  ['Lunar Lounge', '2,094', true, 'L', '#14b8a6'],
+  ['Code Syndicate', '6,713', false, 'C', '#ef4444']
+].map(([name, members, hasBot, initial, color]) => ({ name, members, hasBot, initial, color }));
+
+const channels = [
+  { name: 'general', type: 'Tekstowy', assignment: 'none' },
+  { name: 'logs', type: 'Tekstowy', assignment: 'logs' },
+  { name: 'welcome', type: 'Tekstowy', assignment: 'welcome' },
+  { name: 'Chill Zone', type: 'Głosowy', assignment: 'none' }
+];
+
+const translations = {
+  pl: {
+    loginDiscord: 'Zaloguj przez Discord',
+    loginGoogle: 'Zaloguj przez Google',
+    heroTitle: 'Twój serwer. <span>Bez granic.</span>',
+    heroCopy: 'Coppys łączy zaawansowaną moderację, weryfikację użytkowników i pełną automatyzację w jednym perfekcyjnie dopracowanym panelu WWW.',
+    addBot: 'Dodaj do Discorda',
+    openDashboard: 'Otwórz Panel Zarządzania',
+    servers: 'Serwery',
+    users: 'Użytkownicy',
+    featuresTitle: 'Wszystko, czego potrzebuje Twój serwer.',
+    controlCenter: 'CENTRUM DOWODZENIA',
+    hello: 'Witaj',
+    selectGuild: 'Wybierz serwer, którym chcesz zarządzać.',
+    backGuilds: 'Wróć do serwerów',
+    unsaved: 'Masz niezapisane zmiany!',
+    unsavedHint: 'Zapisz konfigurację, aby wdrożyć ją na serwerze.',
+    cancel: 'Anuluj',
+    save: 'Zapisz zmiany',
+    secureGateway: 'BEZPIECZNA BRAMKA',
+    gatewayTitle: 'Witaj w Nova Gaming',
+    gatewayCopy: 'Zanim dołączysz, potwierdź zapoznanie się z naszymi zasadami społeczności.',
+    terms: 'Regulamin Usług',
+    privacy: 'Polityka Prywatności',
+    verify: 'Zweryfikuj i przejdź do Discorda'
+  },
+  en: {
+    loginDiscord: 'Log in with Discord',
+    loginGoogle: 'Log in with Google',
+    heroTitle: 'Your server. <span>Without limits.</span>',
+    heroCopy: 'Coppys unifies intelligent moderation, user verification, and automation in one sleek web control center.',
+    addBot: 'Add to Discord',
+    openDashboard: 'Open Control Panel',
+    servers: 'Servers',
+    users: 'Users',
+    featuresTitle: 'Everything your server needs.',
+    controlCenter: 'COMMAND CENTER',
+    hello: 'Welcome',
+    selectGuild: 'Choose a server to manage.',
+    backGuilds: 'Back to servers',
+    unsaved: 'You have unsaved changes!',
+    unsavedHint: 'Save your configuration to deploy it to your server.',
+    cancel: 'Cancel',
+    save: 'Save changes',
+    secureGateway: 'SECURE GATEWAY',
+    gatewayTitle: 'Welcome to Nova Gaming',
+    gatewayCopy: 'Before joining, confirm that you have read our community policies.',
+    terms: 'Terms of Service',
+    privacy: 'Privacy Policy',
+    verify: 'Verify and continue to Discord'
+  }
+};
+
+const languageMeta = {
+  pl: ['🇵🇱', 'PL'],
+  en: ['🇬🇧', 'EN'],
+  de: ['🇩🇪', 'DE'],
+  fr: ['🇫🇷', 'FR'],
+  ja: ['🇯🇵', 'JA']
+};
+
+const tabs = [
+  ['overview', '▦', 'Przegląd'],
+  ['channels', '＃', 'Kanały i role'],
+  ['verification', '◉', 'Moduł Weryfikacji'],
+  ['moderation', '◈', 'Automatyczna Moderacja'],
+  ['logs', '☷', 'Logi i Audyt']
+];
+
+function t(key) {
+  return (translations[AppState.language] || translations.en)[key] || translations.en[key] || key;
+}
+
+function applyLanguage() {
+  const lang = translations[AppState.language] ? AppState.language : 'en';
+  document.documentElement.lang = lang;
+  document.querySelector('#current-flag').textContent = languageMeta[AppState.language][0];
+  document.querySelector('#current-language').textContent = languageMeta[AppState.language][1];
+  document.querySelectorAll('[data-i18n]').forEach(e => e.innerHTML = t(e.dataset.i18n));
+  renderLanguageMenu();
+  renderFeatures();
+}
+
+function renderLanguageMenu() {
+  document.querySelector('#language-menu').innerHTML = Object.entries(languageMeta)
+    .map(([key, [flag, label]]) => `<button data-lang="${key}">${flag} ${label}</button>`)
+    .join('');
+}
+
+function switchView(view) {
+  if ((view === 'servers' || view === 'dashboard') && !AppState.user) {
+    location.hash = 'landing';
+    return;
+  }
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === view));
+  AppState.currentView = view;
+  if (view === 'servers') renderGuilds();
+  if (view === 'dashboard') renderDashboard();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function route() {
+  const view = location.hash.slice(1) || 'landing';
+  switchView(['landing', 'servers', 'dashboard', 'gateway', 'terms', 'privacy'].includes(view) ? view : 'landing');
+}
+
+async function checkAuthStatus() {
+  try {
+    const response = await fetch('/api/user', { credentials: 'include', headers: { Accept: 'application/json' } });
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (payload.loggedIn === true) {
+      AppState.user = payload.user || { name:payload.name, tag:payload.tag, avatar:payload.avatar };
+      applyLanguage();
+      if (window.navigate) {
+        window.navigate('servers', AppState.language, true);
+      } else {
+        location.hash = 'servers';
+        route();
+      }
+    }
+  } catch (error) {
+    console.info('OAuth2 Backend standby mode.');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', checkAuthStatus);
+
+document.addEventListener('click', event => {
+  const provider = event.target.closest('#discord-login,#google-login');
+  if (!provider) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  window.location.assign(provider.id === 'discord-login' ? '/api/auth/discord' : '/api/auth/google');
+}, true);
+
+function renderFeatures() {
+  const featureData = window.BotFeaturesData || [];
+  const lang = AppState.language || 'pl';
+
+  document.querySelector('#feature-grid').innerHTML = featureData.map(item => {
+    const title = item.title[lang] || item.title.pl;
+    const desc = item.description[lang] || item.description.pl;
+    return `
+      <article class="feature-card">
+        <div>
+          <div class="feature-header">
+            <div class="feature-icon">${item.icon}</div>
+            <span class="feature-badge">${item.badge}</span>
+          </div>
+          <h3>${title}</h3>
+          <p>${desc}</p>
+        </div>
+        <ul class="capability-list">
+          ${item.capabilities.map(c => `<li>${c}</li>`).join('')}
+        </ul>
+      </article>
+    `;
+  }).join('');
+}
+
+function renderGuilds() {
+  const currentUser = AppState.user || { name: 'Demo User', tag: 'Demo#0000' };
+  document.querySelector('#user-chip').innerHTML = `<span class="avatar">${currentUser.avatar || currentUser.name?.slice(0, 2).toUpperCase() || 'U'}</span><span>${currentUser.tag || currentUser.name}</span>`;
+  document.querySelector('#user-name').textContent = (currentUser.name || currentUser.tag || 'Użytkowniku').split(' ')[0];
+  document.querySelector('#guild-grid').innerHTML = guilds.map((g, i) => `
+    <article class="guild-card">
+      <div class="guild-logo" style="background:linear-gradient(135deg,${g.color},#172554)">${g.initial}</div>
+      <h3>${g.name}</h3>
+      <p>${g.members} członków</p>
+      <button class="button ${g.hasBot ? 'primary' : 'muted'}" data-guild="${i}">
+        ${g.hasBot ? 'Zarządzaj' : '＋ Skonfiguruj i zaproś'}
+      </button>
+    </article>
+  `).join('');
+}
+
+function renderDashboard() {
+  const g = AppState.currentGuild || guilds[0];
+  document.querySelector('#guild-context').innerHTML = `<span class="guild-logo" style="background:${g.color}">${g.initial}</span><span>${g.name}</span>`;
+  document.querySelector('#side-nav').innerHTML = tabs.map(([id, icon, label]) => `
+    <button data-tab="${id}" class="${AppState.dashboardTab === id ? 'active' : ''}">
+      <span>${icon}</span> ${label}
+    </button>
+  `).join('');
+  
+  const tab = tabs.find(x => x[0] === AppState.dashboardTab);
+  document.querySelector('#dashboard-title').textContent = tab[2];
+  const content = document.querySelector('#dashboard-content');
+  
+  if (AppState.dashboardTab === 'overview') content.innerHTML = overviewHTML();
+  else if (AppState.dashboardTab === 'channels') content.innerHTML = channelsHTML();
+  else if (AppState.dashboardTab === 'verification') content.innerHTML = verificationHTML();
+  else content.innerHTML = placeholderHTML(tab[2]);
+}
+
+function overviewHTML() {
+  return `
+    <div class="overview-grid">
+      <div class="metric glass"><small>CZŁONKOWIE</small><strong>12,842</strong></div>
+      <div class="metric glass"><small>AKTYWNE MODUŁY</small><strong>04</strong></div>
+      <div class="metric glass"><small>AKCJE MODERACJI / 24H</small><strong>142</strong></div>
+      <div class="metric glass"><small>STATUS BOTA</small><strong style="color:#47ed91">99.99%</strong></div>
+    </div>
+    <section class="module-card glass">
+      <h2>Stan serwera i bota Coppys</h2>
+      <p>Wszystkie systemy bota pracują zoptymalizowanie. Ostatnia synchronizacja: przed chwilą.</p>
+      <button class="button secondary" data-tab-link="channels">Skonfiguruj kanały →</button>
+    </section>
+  `;
+}
+
+function channelsHTML() {
+  return `
+    <section class="module-card glass">
+      <h2>Struktura kanałów i logów</h2>
+      <p>Przypisz funkcje Coppys do dedykowanych kanałów tekstowych na serwerze.</p>
+      <div class="channel-list">
+        ${channels.map((c, i) => `
+          <div class="channel-row">
+            <div class="channel-name">${c.type === 'Głosowy' ? '◖' : '#'} ${c.name}<small>${c.type}</small></div>
+            <select data-channel="${i}">
+              <option value="none" ${c.assignment === 'none' ? 'selected' : ''}>Standardowy kanał</option>
+              <option value="logs" ${c.assignment === 'logs' ? 'selected' : ''}>Dziennik zdarzeń bota</option>
+              <option value="welcome" ${c.assignment === 'welcome' ? 'selected' : ''}>Powitania i weryfikacja</option>
+            </select>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function verificationHTML() {
+  const d = AppState.draft.verification || { terms: true, role: 'Zweryfikowany', message: 'Witaj na serwerze!\nKliknij przycisk poniżej, aby zaakceptować zasady i odblokować dostęp.' };
+  return `
+    <section class="verification-layout">
+      <div class="module-card glass">
+        <h2>Bramka Weryfikacyjna</h2>
+        <p>Skonfiguruj proces weryfikacji dla nowych członków społeczności.</p>
+        <div class="setting-stack">
+          <div class="setting toggle-line">
+            <div>
+              <label>Wymagaj akceptacji regulaminu</label>
+              <small>Użytkownik musi przeczytać dokumenty przed odblokowaniem rang.</small>
+            </div>
+            <button class="toggle ${d.terms ? 'on' : ''}" id="terms-toggle"><span></span></button>
+          </div>
+          <div class="setting">
+            <label for="verified-role">Rola po pomyślnej weryfikacji</label>
+            <select id="verified-role">
+              ${['Zweryfikowany', 'Członek', 'Nowy Gracz'].map(r => `<option ${r === d.role ? 'selected' : ''}>${r}</option>`).join('')}
+            </select>
+          </div>
+          <div class="setting">
+            <label for="welcome-message">Treść wiadomości powitalnej</label>
+            <textarea id="welcome-message">${d.message}</textarea>
+          </div>
+        </div>
+      </div>
+      <aside class="verification-preview">
+        <p class="eyebrow">PODGLĄD EMED W DISCORDZIE</p>
+        <div class="embed">
+          <strong>Coppys • System Weryfikacji</strong>
+          <p id="embed-preview">${d.message}</p>
+        </div>
+      </aside>
+    </section>
+  `;
+}
+
+function placeholderHTML(name) {
+  return `
+    <section class="module-card glass">
+      <h2>${name}</h2>
+      <p>Moduł jest aktywny i synchronizuje dane w czasie rzeczywistym.</p>
+    </section>
+  `;
+}
+
+function setDirty(value = true) {
+  AppState.isDirty = value;
+  document.querySelector('#save-bar').classList.toggle('visible', value);
+}
+
+function toast(message) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = message;
+  document.querySelector('#toast-region').append(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+document.addEventListener('click', e => {
+  const lang = e.target.closest('[data-lang]');
+  if (lang) {
+    AppState.language = lang.dataset.lang;
+    localStorage.setItem('coppys-language', AppState.language);
+    applyLanguage();
+    document.querySelector('#language-select').classList.remove('open');
+  }
+  if (e.target.closest('#language-trigger')) document.querySelector('#language-select').classList.toggle('open');
+  if (e.target.closest('#add-bot')) toast('Otwieranie zaproszenia bota Coppys…');
+  
+  const guildButton = e.target.closest('[data-guild]');
+  if (guildButton) {
+    const g = guilds[guildButton.dataset.guild];
+    if (g.hasBot) {
+      AppState.currentGuild = g;
+      location.hash = 'dashboard';
+    } else {
+      document.querySelector('#invite-title').textContent = 'Dodaj Coppys do ' + g.name;
+      document.querySelector('#invite-modal').classList.add('open');
+    }
+  }
+  if (e.target.closest('#modal-close')) document.querySelector('#invite-modal').classList.remove('open');
+  if (e.target.closest('#confirm-invite')) {
+    document.querySelector('#invite-modal').classList.remove('open');
+    toast('Przekierowywanie do Discord OAuth2…');
+  }
+  const tab = e.target.closest('[data-tab]');
+  if (tab) {
+    AppState.dashboardTab = tab.dataset.tab;
+    renderDashboard();
+  }
+  const tabLink = e.target.closest('[data-tab-link]');
+  if (tabLink) {
+    AppState.dashboardTab = tabLink.dataset.tabLink;
+    renderDashboard();
+  }
+  if (e.target.closest('#terms-toggle')) {
+    const d = AppState.draft.verification || {};
+    d.terms = !document.querySelector('#terms-toggle').classList.contains('on');
+    AppState.draft.verification = { ...d, role: document.querySelector('#verified-role').value, message: document.querySelector('#welcome-message').value };
+    document.querySelector('#terms-toggle').classList.toggle('on');
+    setDirty();
+  }
+  if (e.target.closest('#hamburger')) {
+    document.querySelector('#sidebar').classList.add('open');
+    document.querySelector('#sidebar-overlay').classList.add('open');
+  }
+  if (e.target.closest('#close-menu') || e.target.closest('#sidebar-overlay')) {
+    document.querySelector('#sidebar').classList.remove('open');
+    document.querySelector('#sidebar-overlay').classList.remove('open');
+  }
+  if (e.target.closest('#discard-changes')) {
+    AppState.draft = {};
+    setDirty(false);
+    renderDashboard();
+  }
+  if (e.target.closest('#save-changes')) {
+    const btn = document.querySelector('#save-changes');
+    btn.textContent = 'Zapisywanie…';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = t('save');
+      btn.disabled = false;
+      setDirty(false);
+      toast('✓ Ustawienia bota zostały wdrożone!');
+    }, 800);
+  }
+});
+
+document.addEventListener('change', e => {
+  if (e.target.matches('[data-channel]')) {
+    channels[e.target.dataset.channel].assignment = e.target.value;
+    setDirty();
+  }
+});
+
+window.addEventListener('hashchange', route);
+applyLanguage();
+route();

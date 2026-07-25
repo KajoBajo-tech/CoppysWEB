@@ -3,61 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Coppys — premiumowy panel zarządzania botem Discord." />
+  <meta name="description" content="Coppys — Nowoczesny bot Discord i zaawansowany panel zarządzania serwerem." />
   <title>Coppys — Discord automation, perfected</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="features.css" />
   <link rel="stylesheet" href="legal.css" />
 </head>
 <body>
-  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
   <div id="toast-region" aria-live="polite"></div>
 
+  <!-- SEKCJA STOISKA (LANDING) -->
   <section id="landing" class="view active">
     <nav class="topbar glass">
-      <a class="brand" href="#landing" aria-label="Coppys home"><span class="brand-mark">C</span><span>COPPYS<span class="dot">.</span></span></a>
+      <a class="brand" href="#landing" aria-label="Coppys Strona Główna">
+        <span class="brand-mark">C</span>
+        <span>COPPYS<span class="dot">.</span></span>
+      </a>
       <div class="nav-actions">
         <div class="language-select" id="language-select">
-          <button class="language-trigger" id="language-trigger" aria-expanded="false"><span id="current-flag">🇵🇱</span><span id="current-language">PL</span><span>⌄</span></button>
+          <button class="language-trigger" id="language-trigger" aria-expanded="false">
+            <span id="current-flag">🇵🇱</span>
+            <span id="current-language">PL</span>
+            <span>⌄</span>
+          </button>
           <div class="language-menu" id="language-menu"></div>
         </div>
-        <button class="login discord" id="discord-login"><span class="discord-icon">◉</span><span data-i18n="loginDiscord">Zaloguj przez Discord</span></button>
-        <button class="login google" id="google-login"><span class="google-icon">G</span><span data-i18n="loginGoogle">Zaloguj przez Google</span></button>
+        <button class="login discord" id="discord-login">
+          <span class="discord-icon">◉</span>
+          <span data-i18n="loginDiscord">Zaloguj przez Discord</span>
+        </button>
+        <button class="login google" id="google-login">
+          <span class="google-icon">G</span>
+          <span data-i18n="loginGoogle">Zaloguj przez Google</span>
+        </button>
       </div>
     </nav>
+
     <main>
       <section class="hero">
         <p class="eyebrow">◈ &nbsp; NEXT-GEN DISCORD AUTOMATION</p>
         <h1 data-i18n="heroTitle">Twój serwer. <span>Bez granic.</span></h1>
-        <p class="hero-copy" data-i18n="heroCopy">Coppys łączy inteligentną moderację, muzykę i automatyzację w jednym perfekcyjnie dopracowanym centrum dowodzenia.</p>
-        <div class="hero-actions"><button class="button primary pulse" id="add-bot">✦ <span data-i18n="addBot">Dodaj do Discorda</span></button><a class="button secondary" href="#servers" data-i18n="openDashboard">Otwórz Panel Zarządzania</a></div>
-        <div class="stats" aria-label="Statystyki Coppys"><div><strong data-count="142521">0</strong><span data-i18n="servers">Serwery</span></div><div><strong data-count="4200000" data-format="compact">0</strong><span data-i18n="users">Użytkownicy</span></div><div><strong>12ms</strong><span>Ping</span></div></div>
+        <p class="hero-copy" data-i18n="heroCopy">
+          Coppys łączy zaawansowaną moderację, weryfikację użytkowników i pełną automatyzację w jednym perfekcyjnie dopracowanym panelu WWW.
+        </p>
+        <div class="hero-actions">
+          <button class="button primary pulse" id="add-bot">
+            ✦ <span data-i18n="addBot">Dodaj do Discorda</span>
+          </button>
+          <a class="button secondary" href="#servers" data-i18n="openDashboard">Otwórz Panel Zarządzania</a>
+        </div>
+        <div class="stats" aria-label="Statystyki Coppys">
+          <div>
+            <strong>100%</strong>
+            <span>Bezpieczeństwa</span>
+          </div>
+          <div>
+            <strong>OAuth2</strong>
+            <span>Autoryzacja</span>
+          </div>
+          <div>
+            <strong>&lt;15ms</strong>
+            <span>Czas Reakcji</span>
+          </div>
+        </div>
       </section>
-      <section class="features"><div class="section-heading"><p class="eyebrow">MODUŁOWA MOC</p><h2 data-i18n="featuresTitle">Wszystko, czego potrzebuje Twój serwer.</h2></div><div class="feature-grid" id="feature-grid"></div></section>
+
+      <section class="features">
+        <div class="section-heading">
+          <p class="eyebrow">MODUŁOWA MOC</p>
+          <h2 data-i18n="featuresTitle">Wszystko, czego potrzebuje Twój serwer.</h2>
+        </div>
+        <div class="feature-grid" id="feature-grid"></div>
+      </section>
     </main>
   </section>
 
+  <!-- SEKCJA WYBORU SERWERÓW -->
   <section id="servers" class="view">
-    <nav class="topbar glass compact"><a class="brand" href="#landing"><span class="brand-mark">C</span><span>COPPYS<span class="dot">.</span></span></a><div class="user-chip" id="user-chip"></div></nav>
-    <main class="page-shell"><p class="eyebrow" data-i18n="controlCenter">CENTRUM DOWODZENIA</p><h1><span data-i18n="hello">Witaj</span>, <span id="user-name">Alex</span>.</h1><p class="lead" data-i18n="selectGuild">Wybierz serwer, którym chcesz zarządzać.</p><div class="guild-grid" id="guild-grid"></div></main>
+    <nav class="topbar glass compact">
+      <a class="brand" href="#landing">
+        <span class="brand-mark">C</span>
+        <span>COPPYS<span class="dot">.</span></span>
+      </a>
+      <div class="user-chip" id="user-chip"></div>
+    </nav>
+    <main class="page-shell">
+      <p class="eyebrow" data-i18n="controlCenter">CENTRUM DOWODZENIA</p>
+      <h1><span data-i18n="hello">Witaj</span>, <span id="user-name">Użytkowniku</span>.</h1>
+      <p class="lead" data-i18n="selectGuild">Wybierz serwer, którym chcesz zarządzać.</p>
+      <div class="guild-grid" id="guild-grid"></div>
+    </main>
   </section>
 
+  <!-- SEKCJA DASHBOARDU -->
   <section id="dashboard" class="view dashboard-view">
-    <aside class="sidebar" id="sidebar"><div class="sidebar-head"><a class="brand" href="#landing"><span class="brand-mark">C</span><span>COPPYS<span class="dot">.</span></span></a><button class="close-menu" id="close-menu">×</button></div><div class="guild-context" id="guild-context"></div><nav class="side-nav" id="side-nav"></nav><a href="#servers" class="back-link">← <span data-i18n="backGuilds">Wróć do serwerów</span></a></aside>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <a class="brand" href="#landing">
+          <span class="brand-mark">C</span>
+          <span>COPPYS<span class="dot">.</span></span>
+        </a>
+        <button class="close-menu" id="close-menu">×</button>
+      </div>
+      <div class="guild-context" id="guild-context"></div>
+      <nav class="side-nav" id="side-nav"></nav>
+      <a href="#servers" class="back-link">← <span data-i18n="backGuilds">Wróć do serwerów</span></a>
+    </aside>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    <main class="dashboard-main"><header class="dashboard-header"><button class="hamburger" id="hamburger">☰</button><div><p class="eyebrow" id="module-kicker">KONFIGURACJA</p><h1 id="dashboard-title">Przegląd</h1></div><div class="live-badge">● ONLINE</div></header><div id="dashboard-content"></div></main>
-    <div class="save-bar" id="save-bar"><div><strong data-i18n="unsaved">Masz niezapisane zmiany!</strong><small data-i18n="unsavedHint">Zapisz konfigurację, aby wdrożyć ją na serwerze.</small></div><div class="save-actions"><button class="text-button" id="discard-changes" data-i18n="cancel">Anuluj</button><button class="button primary" id="save-changes" data-i18n="save">Zapisz zmiany</button></div></div>
+
+    <main class="dashboard-main">
+      <header class="dashboard-header">
+        <button class="hamburger" id="hamburger">☰</button>
+        <div>
+          <p class="eyebrow" id="module-kicker">KONFIGURACJA</p>
+          <h1 id="dashboard-title">Przegląd</h1>
+        </div>
+        <div class="live-badge">● ONLINE</div>
+      </header>
+      <div id="dashboard-content"></div>
+    </main>
+
+    <div class="save-bar" id="save-bar">
+      <div>
+        <strong data-i18n="unsaved">Masz niezapisane zmiany!</strong>
+        <small data-i18n="unsavedHint">Zapisz konfigurację, aby wdrożyć ją na serwerze.</small>
+      </div>
+      <div class="save-actions">
+        <button class="text-button" id="discard-changes" data-i18n="cancel">Anuluj</button>
+        <button class="button primary" id="save-changes" data-i18n="save">Zapisz zmiany</button>
+      </div>
+    </div>
   </section>
 
-  <section id="gateway" class="view gateway-view"><nav class="gateway-nav"><a class="brand" href="#landing"><span class="brand-mark">C</span><span>COPPYS<span class="dot">.</span></span></a></nav><main class="gateway-wrap"><article class="gateway-card glass"><div class="gateway-icons"><span class="server-logo">N</span><span class="connection">✦</span><span class="brand-mark">C</span></div><p class="eyebrow" data-i18n="secureGateway">BEZPIECZNA BRAMKA</p><h1 data-i18n="gatewayTitle">Witaj w Nova Gaming</h1><p data-i18n="gatewayCopy">Zanim dołączysz, potwierdź zapoznanie się z naszymi zasadami społeczności.</p><div class="terms"><button class="document-link" data-document="terms">✓ <span data-i18n="terms">Regulamin Usług</span><span class="doc-state">Wymagane</span></button><button class="document-link" data-document="privacy">✓ <span data-i18n="privacy">Polityka Prywatności</span><span class="doc-state">Wymagane</span></button></div><button class="button primary verify-button" id="verify-button" disabled data-i18n="verify">Zweryfikuj i przejdź do Discorda</button><small>Protected by Coppys Security Engine</small></article></main></section>
-  <div class="modal-backdrop" id="invite-modal"><div class="invite-modal glass"><button class="modal-close" id="modal-close">×</button><p class="eyebrow">ZAPROSZENIE BOT</p><h2 id="invite-title">Dodaj Coppys</h2><p>Przekierujemy Cię do bezpiecznego autoryzatora Discord, aby wybrać wymagane uprawnienia.</p><button class="button primary" id="confirm-invite">Kontynuuj do Discorda →</button></div></div>
+  <!-- BRAMKA WERYFIKACJI (GATEWAY) -->
+  <section id="gateway" class="view gateway-view">
+    <nav class="gateway-nav">
+      <a class="brand" href="#landing">
+        <span class="brand-mark">C</span>
+        <span>COPPYS<span class="dot">.</span></span>
+      </a>
+    </nav>
+    <main class="gateway-wrap">
+      <article class="gateway-card glass">
+        <div class="gateway-icons">
+          <span class="server-logo">N</span>
+          <span class="connection">✦</span>
+          <span class="brand-mark">C</span>
+        </div>
+        <p class="eyebrow" data-i18n="secureGateway">BEZPIECZNA BRAMKA</p>
+        <h1 data-i18n="gatewayTitle">Witaj na Serwerze</h1>
+        <p data-i18n="gatewayCopy">Zanim dołączysz, potwierdź zapoznanie się z naszymi zasadami społeczności.</p>
+        <div class="terms">
+          <button class="document-link" data-document="terms">
+            ✓ <span data-i18n="terms">Regulamin Usług</span>
+            <span class="doc-state">Wymagane</span>
+          </button>
+          <button class="document-link" data-document="privacy">
+            ✓ <span data-i18n="privacy">Polityka Prywatności</span>
+            <span class="doc-state">Wymagane</span>
+          </button>
+        </div>
+        <button class="button primary verify-button" id="verify-button" disabled data-i18n="verify">
+          Zweryfikuj i przejdź do Discorda
+        </button>
+        <small>Protected by Coppys Security Engine</small>
+      </article>
+    </main>
+  </section>
+
+  <!-- MODAL ZAPROSZENIA BOTA -->
+  <div class="modal-backdrop" id="invite-modal">
+    <div class="invite-modal glass">
+      <button class="modal-close" id="modal-close">×</button>
+      <p class="eyebrow">ZAPROSZENIE BOTA</p>
+      <h2 id="invite-title">Dodaj Coppys</h2>
+      <p>Przekierujemy Cię do bezpiecznego autoryzatora Discord, aby wybrać wymagane uprawnienia.</p>
+      <button class="button primary" id="confirm-invite">Kontynuuj do Discorda →</button>
+    </div>
+  </div>
+
+  <!-- REGULAMIN -->
   <section id="terms" class="view legal-view">
-    <nav class="topbar glass compact"><a class="brand" href="#landing"><span class="brand-mark">C</span><span>COPPYS<span class="dot">.</span></span></a><a class="button secondary" href="#landing">← Powrót</a></nav>
-    <main class="page-shell legal-content glass"><p class="eyebrow">DOKUMENT PRAWNY</p><h1>Regulamin Usług</h1><p class="muted-text">Ostatnia aktualizacja: 14 lipca 2026 r.</p><h2>1. Postanowienia ogólne</h2><p class="muted-text">Niniejszy Regulamin określa zasady korzystania z bota Coppys, jego witryny oraz panelu zarządzania. Korzystając z Usług, użytkownik potwierdza, że posiada wymagane uprawnienia do zarządzania serwerem Discord i akceptuje warunki opisane w tym dokumencie.</p><p class="muted-text">Coppys udostępnia narzędzia automatyzacji, moderacji i konfiguracji społeczności. Administrator serwera odpowiada za sposób konfiguracji modułów oraz zgodność treści i działań społeczności z obowiązującym prawem i zasadami Discord.</p><h2>2. Odpowiedzialność</h2><p class="muted-text">Usługi są dostarczane w modelu „tak jak są”. Dokładamy rozsądnych starań, by utrzymać ich dostępność i bezpieczeństwo, jednak nie gwarantujemy nieprzerwanego działania ani pełnej zgodności z każdym zastosowaniem użytkownika.</p><p class="muted-text">W granicach dopuszczalnych przez prawo Coppys nie odpowiada za szkody pośrednie, utratę danych ani konsekwencje wynikające z ustawień wprowadzonych przez administratorów serwerów.</p></main>
+    <nav class="topbar glass compact">
+      <a class="brand" href="#landing">
+        <span class="brand-mark">C</span>
+        <span>COPPYS<span class="dot">.</span></span>
+      </a>
+      <a class="button secondary" href="#landing">← Powrót</a>
+    </nav>
+    <main class="page-shell legal-content glass">
+      <p class="eyebrow">DOKUMENT PRAWNY</p>
+      <h1>Regulamin Usług</h1>
+      <p class="muted-text">Ostatnia aktualizacja: 25 lipca 2026 r.</p>
+      <h2>1. Postanowienia ogólne</h2>
+      <p class="muted-text">
+        Niniejszy Regulamin określa zasady korzystania z bota Coppys, jego witryny oraz panelu zarządzania. Korzystając z Usług, użytkownik potwierdza, że posiada wymagane uprawnienia do zarządzania serwerem Discord.
+      </p>
+      <h2>2. Działanie bota i ochrona</h2>
+      <p class="muted-text">
+        Coppys świadczy usługi automatyzacji moderacji, dzienników zdarzeń oraz bramki weryfikacyjnej. Korzystanie z bota jest dobrowolne, a konfiguracja opiera się na uprawnieniach przyznanych przez administratorów serwera.
+      </p>
+    </main>
   </section>
+
+  <!-- POLITYKA PRYWATNOŚCI -->
   <section id="privacy" class="view legal-view">
-    <nav class="topbar glass compact"><a class="brand" href="#landing"><span class="brand-mark">C</span><span>COPPYS<span class="dot">.</span></span></a><a class="button secondary" href="#landing">← Powrót</a></nav>
-    <main class="page-shell legal-content glass"><p class="eyebrow">DOKUMENT PRAWNY</p><h1>Polityka Prywatności</h1><p class="muted-text">Ostatnia aktualizacja: 14 lipca 2026 r.</p><h2>1. Jakie dane zbieramy?</h2><p class="muted-text">W celu obsługi logowania OAuth2 możemy przetwarzać podstawowe dane konta przekazane przez wybranego dostawcę, w tym identyfikator użytkownika, nazwę wyświetlaną, tag oraz adres awatara. Podczas konfiguracji serwera przetwarzamy również dane techniczne niezbędne do działania wybranych modułów bota.</p><p class="muted-text">Nie pozyskujemy haseł do Discorda ani Google. Dane uwierzytelniające są obsługiwane wyłącznie przez bezpieczny mechanizm OAuth2 dostawcy tożsamości.</p><h2>2. Cel przetwarzania danych</h2><p class="muted-text">Dane wykorzystujemy do uwierzytelnienia użytkownika, wyświetlenia serwerów, do których ma uprawnienia, zapisania konfiguracji Coppys oraz zapewnienia bezpieczeństwa i ciągłości działania Usług.</p><p class="muted-text">Dane przechowujemy tylko przez okres konieczny do realizacji tych celów lub wynikający z przepisów prawa. Użytkownik może zwrócić się o informacje dotyczące swoich danych lub ich usunięcie, korzystając z kanału wsparcia Coppys.</p></main>
+    <nav class="topbar glass compact">
+      <a class="brand" href="#landing">
+        <span class="brand-mark">C</span>
+        <span>COPPYS<span class="dot">.</span></span>
+      </a>
+      <a class="button secondary" href="#landing">← Powrót</a>
+    </nav>
+    <main class="page-shell legal-content glass">
+      <p class="eyebrow">DOKUMENT PRAWNY</p>
+      <h1>Polityka Prywatności</h1>
+      <p class="muted-text">Ostatnia aktualizacja: 25 lipca 2026 r.</p>
+      <h2>1. Przetwarzane dane</h2>
+      <p class="muted-text">
+        W celu obsługi logowania OAuth2 i panelu zarządzania przetwarzamy ID użytkownika, nazwę konta, awatar oraz identyfikatory serwerów. Nie przechowujemy haseł ani prywatnych danych dostępowych.
+      </p>
+    </main>
   </section>
+
+  <!-- SKRYPTY APLIKACJI -->
+  <script src="bot-features.js"></script>
   <script src="app.js"></script>
   <script src="router.js"></script>
 </body>
