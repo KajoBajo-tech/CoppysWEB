@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moja Strona</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .lang-select { margin-bottom: 20px; }
+        button { padding: 8px 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- Wybór języka -->
+    <div class="lang-select">
+        <label for="languageSwitcher">Język / Language: </label>
+        <select id="languageSwitcher" onchange="changeLanguage(this.value)">
+            <option value="pl">Polski</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <h1 id="title">Witaj na stronie</h1>
+    <p id="description">To jest przykładowa treść Twojej aplikacji.</p>
+
+    <hr>
+
+    <button onclick="fetchStatus()">Sprawdź status serwera</button>
+    <p id="serverOutput"></p>
+
+    <script>
+        // Słownik tłumaczeń
+        const translations = {
+            pl: {
+                title: "Witaj na stronie",
+                description: "To jest przykładowa treść Twojej aplikacji.",
+                btnStatus: "Sprawdź status serwera"
+            },
+            en: {
+                title: "Welcome to the website",
+                description: "This is sample content for your application.",
+                btnStatus: "Check server status"
+            }
+        };
+
+        // Zmiana języka na stronie
+        function changeLanguage(lang) {
+            localStorage.setItem('preferredLang', lang);
+            
+            document.getElementById('title').textContent = translations[lang].title;
+            document.getElementById('description').textContent = translations[lang].description;
+        }
+
+        // Pobieranie niezależnej wiadomości z serwera
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                document.getElementById('serverOutput').textContent = data.message;
+            } catch (err) {
+                document.getElementById('serverOutput').textContent = "Błąd połączenia z serwerem.";
+            }
+        }
+
+        // Wczytanie zapisanego języka przy starcie
+        const savedLang = localStorage.getItem('preferredLang') || 'pl';
+        document.getElementById('languageSwitcher').value = savedLang;
+        changeLanguage(savedLang);
+    </script>
+</body>
+</html>
